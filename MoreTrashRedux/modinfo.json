@@ -1,0 +1,62 @@
+{
+  "name": "More Trash Redux",
+  "author": "Aidanamite",
+  "description": "Increases the trash flow",
+  "version": "1.0.9",
+  "license": "GNU AGPLv3",
+  "icon": "icon.png",
+  "banner": "banner.jpg",
+  "gameVersion": "1.0",
+  "requiredByAllPlayers": false,
+  "updateUrl": "https://www.raftmodding.com/api/v1/mods/more-trash-redux/version.txt",
+  "isModPermanent": false,
+  "excludedFiles": [],
+  "modSettings": [
+    {
+      "name": "Global settings:",
+      "type": "text"
+    },
+    {
+      "name": "Disable Trash Spawn",
+      "type": "checkbox",
+      "default": false
+    },
+    {
+      "name": "Spawn Delay",
+      "text": "Spawn Delay Multiplier",
+      "type": "input",
+      "default": "0.5",
+      "mode": "DecimalNumber"
+    },
+    {
+      "name": "Clear Items",
+      "type": "button",
+      "access": "world"
+    },
+    {
+      "name": "World settings:",
+      "type": "text",
+      "access": "world"
+    },
+    {
+      "name": "Use global settings",
+      "type": "checkbox",
+      "default": true,
+      "access": "world"
+    },
+    {
+      "name": "Disable Trash Spawn ",
+      "type": "checkbox",
+      "default": false,
+      "access": "world"
+    },
+    {
+      "name": "Spawn Delay ",
+      "text": "Spawn Delay Multiplier",
+      "type": "input",
+      "default": "0.5",
+      "access": "world",
+      "mode": "DecimalNumber"
+    }
+  ]
+}
