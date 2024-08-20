@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using HMLLibrary;
 using RaftModLoader;
+using System.Runtime.CompilerServices;
 
 public class MoreTrashRedux : Mod
 {
@@ -18,12 +19,13 @@ public class MoreTrashRedux : Mod
     static public bool WorldCheck;
     static public bool scheduleCheck;
     static bool debugLogging = false;
+    static bool commandSet = false;
     Harmony harmony;
     static public float multiplier
     {
         get
         {
-            if (ExtraSettingsAPI_Loaded)
+            if (ExtraSettingsAPI_Loaded || commandSet)
             {
                 if (DiffCheck)
                     return GlobalCheck ? float.PositiveInfinity : GlobalDelay;
@@ -63,7 +65,7 @@ public class MoreTrashRedux : Mod
     public static string MyCommand2(string[] args)
     {
         if (args == null || args.Length < 1)
-            return "Not enough arguments";
+            return "Delay multiplier is " + multiplier;
         GlobalDelay = Parse(args[0]);
         if (GlobalDelay < 0.00001f)
             GlobalDelay = 0.00001f;
@@ -78,6 +80,8 @@ public class MoreTrashRedux : Mod
             GlobalCheck = false;
             ExtraSettingsAPI_SetCheckboxState("Disable Trash Spawn", GlobalCheck);
         }
+        if (!ExtraSettingsAPI_Loaded)
+            commandSet = true;
         RemodifyAll();
         return "Delay multiplier is now " + GlobalDelay;
     }
@@ -242,38 +246,27 @@ public class MoreTrashRedux : Mod
         }
     }
 
-    static float Parse(string value)
+    static float Parse(string value, float fallback = 1)
     {
-
         if (debugLogging)
             Log($"Attempting to parse \"{value}\"");
         if (string.IsNullOrWhiteSpace(value))
         {
             if (debugLogging)
-                Log("The value that was attempted to parse was " + (string.IsNullOrEmpty(value) ? "null/empty" : "whitespace") + ". returning 1");
-            return 1;
+                Log("The value that was attempted to parse was " + (string.IsNullOrEmpty(value) ? "null/empty" : "whitespace") + ". returning " + fallback);
+            return fallback;
         }
         if (value.Contains(",") && !value.Contains("."))
             value = value.Replace(',', '.');
-        var c = CultureInfo.CurrentCulture;
-        CultureInfo.CurrentCulture = CultureInfo.GetCultureInfoByIetfLanguageTag("en-NZ");
-        Exception e = null;
-        float r = 0;
-        try
-        {
-            r = float.Parse(value);
-            if (debugLogging)
-                Log("Successfully parsed value " + r);
-        } catch (Exception e2)
+        if (float.TryParse(value, NumberStyles.Float, CultureInfo.InvariantCulture, out var v))
         {
             if (debugLogging)
-                Log("An error occured trying to parse the value");
-            e = e2;
+                Log("Successfully parsed value " + v);
+            return v;
         }
-        CultureInfo.CurrentCulture = c;
-        if (e != null)
-            throw e;
-        return r;
+        if (debugLogging)
+            Log("Failed to parse the value. returning " + fallback);
+        return fallback;
     }
 
     public void ExtraSettingsAPI_SettingsClose()
@@ -283,6 +276,7 @@ public class MoreTrashRedux : Mod
     }
     public void ExtraSettingsAPI_Load()
     {
+        commandSet = false;
         getSettings();
         RemodifyAll();
     }
@@ -300,28 +294,33 @@ public class MoreTrashRedux : Mod
     }
 
     static bool ExtraSettingsAPI_Loaded = false;
+    [MethodImpl(MethodImplOptions.NoInlining)]
     public static bool ExtraSettingsAPI_GetCheckboxState(string SettingName)
     {
         if (ExtraSettingsAPI_Loaded)
             LogError("Settings API has not patched the mod correctly");
         return false;
     }
+    [MethodImpl(MethodImplOptions.NoInlining)]
     public static string ExtraSettingsAPI_GetInputValue(string SettingName)
     {
         if (ExtraSettingsAPI_Loaded)
             LogError("Settings API has not patched the mod correctly");
         return "";
     }
+    [MethodImpl(MethodImplOptions.NoInlining)]
     public static void ExtraSettingsAPI_SetCheckboxState(string SettingName, bool value)
     {
         if (ExtraSettingsAPI_Loaded)
             LogError("Settings API has not patched the mod correctly");
     }
+    [MethodImpl(MethodImplOptions.NoInlining)]
     public static void ExtraSettingsAPI_SetInputValue(string SettingName, string value)
     {
         if (ExtraSettingsAPI_Loaded)
             LogError("Settings API has not patched the mod correctly");
     }
+    [MethodImpl(MethodImplOptions.NoInlining)]
     public static void ExtraSettingsAPI_SaveSettings()
     {
         if (ExtraSettingsAPI_Loaded)
